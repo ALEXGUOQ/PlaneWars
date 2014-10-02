@@ -10,13 +10,13 @@ import android.graphics.Paint;
  * Author: hukai.me
  */
 public abstract class BaseObj {
-    public int speed;
     public float x;
     public float y;
     public float w;
     public float h;
     public float centerX;
     public float centerY;
+    public int speed;
     public boolean isAlive;
     public Paint paint = new Paint();
 

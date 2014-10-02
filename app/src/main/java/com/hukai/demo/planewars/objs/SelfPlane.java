@@ -22,28 +22,26 @@ import java.util.List;
 public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
 
     private static final String TAG = SelfPlane.class.getSimpleName();
-    private SelfBullet selfBullet;
+    private SelfBullet mSelfBullet;
     private Bitmap mPlaneBmp;
-    private Bitmap mPlaneDieBmp;
 
     public SelfPlane(Context context) {
         speed = ConstantData.BASE_PLANE_SPEED;
         mPlaneBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane);
-        mPlaneDieBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane);
         w = mPlaneBmp.getWidth();
         h = mPlaneBmp.getHeight();
         x = (MainActivity.mScreenWidth - w) / 2;
         y = MainActivity.mScreenHeight - h;
         centerX = x + w / 2;
         centerY = y + h / 2;
-        selfBullet = BulletFactory.newSelfBullet(context);
+        mSelfBullet = BulletFactory.newSelfBullet(context);
     }
 
     @Override
     public void init(int speedRate, float centerX, float centerY) {
         speed = ConstantData.BASE_PLANE_SPEED  * (speedRate + 1);
-        if (!selfBullet.isAlive) {
-            selfBullet.init(ConstantData.BASE_SPEED_RATE, centerX, centerY);
+        if (!mSelfBullet.isAlive) {
+            mSelfBullet.init(ConstantData.BASE_SPEED_RATE, centerX, centerY);
         }
     }
 
@@ -52,10 +50,6 @@ public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
         if (isAlive) {
             canvas.save();
             canvas.drawBitmap(mPlaneBmp, x, y, paint);
-            canvas.restore();
-        } else {
-            canvas.save();
-            canvas.drawBitmap(mPlaneDieBmp, x, y, paint);
             canvas.restore();
         }
     }
@@ -69,18 +63,18 @@ public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
 
     @Override
     public void fire(Canvas canvas, List<EnemyPlane> enemyPlanes) {
-        if (!selfBullet.isAlive) {
+        if (!mSelfBullet.isAlive) {
             return;
         }
         for (EnemyPlane enemyPlane : enemyPlanes) {
-            if (enemyPlane.isCanCollide() && selfBullet.checkCollide(enemyPlane)) {
-                enemyPlane.beAttacked(selfBullet.mPower);
+            if (enemyPlane.canCollide() && mSelfBullet.checkCollide(enemyPlane)) {
+                enemyPlane.beAttacked(mSelfBullet.mPower);
                 if (enemyPlane.isExplosion) {
                     MainActivity.mSumScore += enemyPlane.initBlood;
                 }
                 break;
             }
         }
-        selfBullet.draw(canvas);
+        mSelfBullet.draw(canvas);
     }
 }

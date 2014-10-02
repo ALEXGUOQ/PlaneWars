@@ -17,7 +17,7 @@ import java.util.Random;
  * Date: 2014-10-02
  * Author: hukai.me
  */
-public class EnemyPlane extends BaseObj implements ActionMove{
+public class EnemyPlane extends BaseObj implements ActionMove {
     public int blood;
     public int initBlood;
     public boolean isExplosion;
@@ -40,7 +40,7 @@ public class EnemyPlane extends BaseObj implements ActionMove{
         Random random = new Random();
         speed = (ConstantData.BASE_PLANE_SPEED + random.nextInt(5)) * speedRate;
         x = random.nextInt((int) (MainActivity.mScreenWidth - w));
-        y = random.nextInt((int)h * 3) - h;
+        y = random.nextInt((int) h * 3) - h;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class EnemyPlane extends BaseObj implements ActionMove{
                 move(0, speed);
             } else {
                 canvas.save();
-                canvas.drawBitmap(mEnemyBmp, x, y - y, paint);
+                canvas.drawBitmap(mEnemyBmp, x, y, paint);
                 canvas.restore();
                 isExplosion = false;
                 isAlive = false;
@@ -87,20 +87,17 @@ public class EnemyPlane extends BaseObj implements ActionMove{
     public boolean isCollide(BaseObj obj) {
         if (x + w <= obj.x) {
             return false;
-        }
-        else if (obj.x + obj.w <= x) {
+        } else if (obj.x + obj.w <= x) {
             return false;
-        }
-        else if (y + h <= obj.y) {
+        } else if (y + h <= obj.y) {
             return false;
-        }
-        else if (obj.y + obj.h <= y) {
+        } else if (obj.y + obj.h <= y) {
             return false;
         }
         return true;
     }
 
-    public boolean isCanCollide() {
+    public boolean canCollide() {
         return isAlive && !isExplosion && isVisible;
     }
 }

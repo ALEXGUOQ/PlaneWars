@@ -40,10 +40,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private static final int MSG_FINISH = 1001;
 
     private DrawHandler mDrawHandler;
-    private HandlerThread handlerThread;
+    private HandlerThread mHandlerThread;
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;
-    private Canvas canvas;
+    private Canvas mCanvas;
+    private Paint mPaint = new Paint();
 
     private ArrayList<EnemyPlane> mEnemyPlaneList = new ArrayList<EnemyPlane>();
     private SelfPlane mSelfPlane;
@@ -55,16 +56,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private boolean mIsTouchSelfPlane;
     private Bitmap mPlayBtnBmp;
     private Bitmap mPauseBtnBmp;
-    private Paint mPaint = new Paint();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "[onCreate] + BEGIN");
         setContentView(R.layout.activity_main);
-        handlerThread = new HandlerThread("DrawThread");
-        handlerThread.start();
-        mDrawHandler = new DrawHandler(handlerThread.getLooper());
+        mHandlerThread = new HandlerThread("DrawThread");
+        mHandlerThread.start();
+        mDrawHandler = new DrawHandler(mHandlerThread.getLooper());
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceview);
         mSurfaceHolder = mSurfaceView.getHolder();
         mSurfaceHolder.addCallback(this);
@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "[surfaceDestroyed] + BEGIN");
-        handlerThread.quit();
+        mHandlerThread.quit();
         Log.d(TAG, "[surfaceDestroyed] + END");
     }
 
@@ -199,6 +199,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     private class DrawHandler extends Handler {
 
+        int textColor = getResources().getColor(android.R.color.holo_blue_dark);
+
         DrawHandler(Looper looper) {
             super(looper);
         }
@@ -230,27 +232,31 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         private void initDrawObjs() {
+            mSelfPlane.init(mSpeedRate, mSelfPlane.centerX, mSelfPlane.centerY);
+
             for (EnemyPlane obj : mEnemyPlaneList) {
                 if (!obj.isAlive) {
                     obj.init(mSpeedRate, 0, 0);
                     break;
                 }
             }
-            mSelfPlane.init(mSpeedRate, mSelfPlane.centerX, mSelfPlane.centerY);
-            if (mSumScore >= mSpeedRate * ConstantData.UPGRADE_SPEED_SCORE && mSpeedRate < ConstantData.MAX_SPEED_RATE) {
+
+
+            if (mSumScore >= mSpeedRate * ConstantData.UPGRADE_SPEED_SCORE
+                    && mSpeedRate < ConstantData.MAX_SPEED_RATE) {
                 mSpeedRate++;
             }
         }
 
         private void invokeDrawObjs() {
             try {
-                canvas = mSurfaceHolder.lockCanvas();
-                canvas.drawColor(Color.WHITE);
+                mCanvas = mSurfaceHolder.lockCanvas();
+                mCanvas.drawColor(Color.WHITE);
 
                 for (EnemyPlane obj : mEnemyPlaneList) {
                     if (obj.isAlive) {
-                        obj.draw(canvas);
-                        if (obj.isCanCollide() && mSelfPlane.isAlive) {
+                        obj.draw(mCanvas);
+                        if (obj.canCollide() && mSelfPlane.isAlive) {
                             if (obj.isCollide(mSelfPlane)) {
                                 mSelfPlane.isAlive = false;
                             }
@@ -263,25 +269,25 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     mDrawHandler.sendEmptyMessage(MSG_FINISH);
                 }
 
-                canvas.save();
+                mCanvas.save();
                 if (mIsPlaying) {
-                    canvas.drawBitmap(mPlayBtnBmp, 20, 20, mPaint);
+                    mCanvas.drawBitmap(mPlayBtnBmp, 20, 20, mPaint);
                 } else {
-                    canvas.drawBitmap(mPauseBtnBmp, 20, 20, mPaint);
+                    mCanvas.drawBitmap(mPauseBtnBmp, 20, 20, mPaint);
                 }
-                canvas.restore();
+                mCanvas.restore();
 
-                mSelfPlane.draw(canvas);
-                mSelfPlane.fire(canvas, mEnemyPlaneList);
+                mSelfPlane.draw(mCanvas);
+                mSelfPlane.fire(mCanvas, mEnemyPlaneList);
 
                 mPaint.setTextSize(36);
-                mPaint.setColor(getResources().getColor(android.R.color.holo_blue_dark));
-                canvas.drawText("Score:" + mSumScore + ", Speed:" + mSpeedRate, 30 + mPlayPauseBtnW, 70, mPaint);
+                mPaint.setColor(textColor);
+                mCanvas.drawText("Score:" + mSumScore + ", Speed:" + mSpeedRate, 30 + mPlayPauseBtnW, 70, mPaint);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                if (canvas != null) {
-                    mSurfaceHolder.unlockCanvasAndPost(canvas);
+                if (mCanvas != null) {
+                    mSurfaceHolder.unlockCanvasAndPost(mCanvas);
                 }
             }
         }
