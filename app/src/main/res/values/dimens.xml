@@ -9,6 +9,9 @@
     <dimen name="action_button_text_size">26sp</dimen>
     <dimen name="hello_text_size">36sp</dimen>
 
+    <dimen name="version_text_size">16sp</dimen>
+
+
 
 
 </resources>

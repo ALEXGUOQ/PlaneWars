@@ -11,7 +11,7 @@ import java.util.List;
  * Date: 2014-10-02
  * Author: hukai.me
  */
-public interface ActionShoot {
+public interface ActionFire {
 
     public void fire(Canvas canvas, List<EnemyPlane> enemyPlanes);
 

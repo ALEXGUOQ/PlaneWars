@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Log;
 
+import com.hukai.demo.planewars.ActionFire;
 import com.hukai.demo.planewars.ActionMove;
-import com.hukai.demo.planewars.ActionShoot;
 import com.hukai.demo.planewars.MainActivity;
 import com.hukai.demo.planewars.R;
 import com.hukai.demo.planewars.data.ConstantData;
@@ -19,7 +19,7 @@ import java.util.List;
  * Date: 2014-10-02
  * Author: hukai.me
  */
-public class SelfPlane extends BaseObj implements ActionShoot, ActionMove {
+public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
 
     private static final String TAG = SelfPlane.class.getSimpleName();
     private SelfBullet selfBullet;
@@ -42,6 +42,9 @@ public class SelfPlane extends BaseObj implements ActionShoot, ActionMove {
     @Override
     public void init(int speedRate, float centerX, float centerY) {
         speed = ConstantData.BASE_PLANE_SPEED  * (speedRate + 1);
+        if (!selfBullet.isAlive) {
+            selfBullet.init(ConstantData.BASE_SPEED_RATE, centerX, centerY);
+        }
     }
 
     @Override
@@ -79,11 +82,5 @@ public class SelfPlane extends BaseObj implements ActionShoot, ActionMove {
             }
         }
         selfBullet.draw(canvas);
-    }
-
-    public void initBullet() {
-        if (!selfBullet.isAlive) {
-            selfBullet.init(ConstantData.BASE_SPEED_RATE, centerX, centerY);
-        }
     }
 }

@@ -38,7 +38,7 @@ public class EnemyPlane extends BaseObj implements ActionMove{
         setCenterX(centerX);
         setCenterY(centerY);
         Random random = new Random();
-        speed = ConstantData.BASE_PLANE_SPEED + random.nextInt(5) * speedRate;
+        speed = (ConstantData.BASE_PLANE_SPEED + random.nextInt(5)) * speedRate;
         x = random.nextInt((int) (MainActivity.mScreenWidth - w));
         y = random.nextInt((int)h * 3) - h;
     }

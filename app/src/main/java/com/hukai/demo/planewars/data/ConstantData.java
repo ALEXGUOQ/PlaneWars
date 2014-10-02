@@ -8,7 +8,7 @@ package com.hukai.demo.planewars.data;
 public class ConstantData {
     public static final int MAX_ENEMY_PLANE_COUNT = 10;
 
-    public static final int UPGRADE_SPEED_SCORE = 100;
+    public static final int UPGRADE_SPEED_SCORE = 50;
     public static final int MAX_SPEED_RATE = 20;
     public static final int BASE_SPEED_RATE = 1;
 

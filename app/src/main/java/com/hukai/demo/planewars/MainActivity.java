@@ -212,9 +212,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     invokeDrawObjs();
                     if (!mIsPlaying) {
                         this.removeMessages(MSG_DRAW);
-                        this.sendEmptyMessage(MSG_FINISH);
                     } else {
-                        int delayTime = 50;
+                        int delayTime = 80;
                         Message newMsg = this.obtainMessage(MSG_DRAW);
                         this.sendMessageDelayed(newMsg, delayTime);
                     }
@@ -237,7 +236,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     break;
                 }
             }
-            mSelfPlane.initBullet();
+            mSelfPlane.init(mSpeedRate, mSelfPlane.centerX, mSelfPlane.centerY);
             if (mSumScore >= mSpeedRate * ConstantData.UPGRADE_SPEED_SCORE && mSpeedRate < ConstantData.MAX_SPEED_RATE) {
                 mSpeedRate++;
             }
@@ -261,6 +260,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
                 if (!mSelfPlane.isAlive) {
                     mIsPlaying = false;
+                    mDrawHandler.sendEmptyMessage(MSG_FINISH);
                 }
 
                 canvas.save();
