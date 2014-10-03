@@ -86,17 +86,13 @@ public class EnemyPlane extends BaseObj implements ActionMove {
         }
     }
 
-    public boolean isCollide(BaseObj obj) {
-        if (x + w <= obj.x) {
+    public boolean checkCollide(BaseObj obj) {
+        if (obj.x >= x + w || obj.x + obj.w <= x
+                || obj.y >= y + h || obj.y + obj.h <= y) {
             return false;
-        } else if (obj.x + obj.w <= x) {
-            return false;
-        } else if (y + h <= obj.y) {
-            return false;
-        } else if (obj.y + obj.h <= y) {
-            return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     public boolean canCollide() {

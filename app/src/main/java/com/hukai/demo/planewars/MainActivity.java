@@ -168,23 +168,23 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             if (mIsTouchMainPlane) {
                 float x = event.getX();
                 float y = event.getY();
-                if (x > mMainPlane.centerX + Constant.TOUCH_PLANE_RANGE) {
+                if (x > mMainPlane.centerX + mMainPlane.w / 2) {
                     if (mMainPlane.centerX + mMainPlane.speed <= mScreenWidth) {
                         float moveX = mMainPlane.centerX + mMainPlane.speed;
                         mMainPlane.move(moveX, mMainPlane.centerY);
                     }
-                } else if (x < mMainPlane.centerX - Constant.TOUCH_PLANE_RANGE) {
+                } else if (x < mMainPlane.centerX - mMainPlane.w / 2) {
                     if (mMainPlane.centerX - mMainPlane.speed >= 0) {
                         float moveX = mMainPlane.centerX - mMainPlane.speed;
                         mMainPlane.move(moveX, mMainPlane.centerY);
                     }
                 }
-                if (y > mMainPlane.centerY + Constant.TOUCH_PLANE_RANGE) {
+                if (y > mMainPlane.centerY + mMainPlane.h / 2) {
                     if (mMainPlane.centerY + mMainPlane.speed <= mScreenHeight) {
                         float moveY = mMainPlane.centerY + mMainPlane.speed;
                         mMainPlane.move(mMainPlane.centerX, moveY);
                     }
-                } else if (y < mMainPlane.centerY - Constant.TOUCH_PLANE_RANGE) {
+                } else if (y < mMainPlane.centerY - mMainPlane.h / 2) {
                     if (mMainPlane.centerY - mMainPlane.speed >= 0) {
                         float moveY = mMainPlane.centerY - mMainPlane.speed;
                         mMainPlane.move(mMainPlane.centerX, moveY);
@@ -257,7 +257,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 if (obj.isAlive) {
                     obj.draw(mCanvas);
                     if (obj.canCollide() && mMainPlane.isAlive) {
-                        if (obj.isCollide(mMainPlane)) {
+                        if (obj.checkCollide(mMainPlane)) {
                             mMainPlane.isAlive = false;
                         }
                     }

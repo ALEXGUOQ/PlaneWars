@@ -19,10 +19,6 @@ public class Constant {
     public static final int BASE_BULLET_POWER = 1;
     public static final int BASE_BULLET_SPEED = 200;
 
-    public static final int TOUCH_PLANE_RANGE = 30;
-
     public static final int MARGIN_PLAY_PAUSE_BTN = 20;
-
-
 
 }

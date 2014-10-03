@@ -56,24 +56,11 @@ public class MainBullet extends BaseObj implements ActionMove {
     }
 
     public boolean checkCollide(BaseObj obj) {
-//        if (y >= obj.y && x >= obj.x && x + w <= obj.x + obj.w) {
-//            isAlive = false;
-//            return true;
-//        }
-        if (x + w <= obj.x) {
+        if (y >= obj.y && x >= obj.x && x + w <= obj.x + obj.w) {
+            isAlive = false;
+            return true;
+        } else {
             return false;
-        } else if (obj.x + obj.w <= x) {
-            return false;
-        } else if (y + h <= obj.y) {
-            return false;
-        } else if (obj.y + obj.h <= y) {
-            if (y - speed < obj.y) {
-                Log.d("MainBullet", "isAlive = false");
-                isAlive = false;
-                return true;
-            }
         }
-        isAlive = false;
-        return true;
     }
 }
