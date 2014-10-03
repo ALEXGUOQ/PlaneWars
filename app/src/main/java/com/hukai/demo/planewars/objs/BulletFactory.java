@@ -8,7 +8,7 @@ import android.content.Context;
  * Author: hukai.me
  */
 public class BulletFactory {
-    public static SelfBullet newSelfBullet(Context context) {
-        return new SelfBullet(context);
+    public static MainBullet newMainBullet(Context context) {
+        return new MainBullet(context);
     }
 }

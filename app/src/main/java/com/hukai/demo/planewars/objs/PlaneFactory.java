@@ -12,7 +12,7 @@ public class PlaneFactory {
         return new EnemyPlane(context);
     }
 
-    public static SelfPlane newSelfPlane(Context context) {
-        return new SelfPlane(context);
+    public static MainPlane newMainPlane(Context context) {
+        return new MainPlane(context);
     }
 }

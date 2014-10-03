@@ -17,10 +17,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.hukai.demo.planewars.data.ConstantData;
 import com.hukai.demo.planewars.objs.EnemyPlane;
 import com.hukai.demo.planewars.objs.PlaneFactory;
-import com.hukai.demo.planewars.objs.SelfPlane;
+import com.hukai.demo.planewars.objs.MainPlane;
 
 import java.util.ArrayList;
 
@@ -47,13 +46,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private Paint mPaint = new Paint();
 
     private ArrayList<EnemyPlane> mEnemyPlaneList = new ArrayList<EnemyPlane>();
-    private SelfPlane mSelfPlane;
+    private MainPlane mMainPlane;
 
     private int mSpeedRate;
     private float mPlayPauseBtnW;
     private float mPlayPauseBtnH;
     private boolean mIsPlaying;
-    private boolean mIsTouchSelfPlane;
+    private boolean mIsTouchMainPlane;
     private Bitmap mPlayBtnBmp;
     private Bitmap mPauseBtnBmp;
 
@@ -87,9 +86,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         mScreenWidth = mSurfaceView.getWidth();
         mScreenHeight = mSurfaceView.getHeight();
         mSumScore = 0;
-        mSpeedRate = ConstantData.BASE_SPEED_RATE;
-        mSelfPlane = PlaneFactory.newSelfPlane(this);
-        for (int i = 0; i < ConstantData.MAX_ENEMY_PLANE_COUNT; i++) {
+
+        mSpeedRate = Constant.BASE_SPEED_RATE;
+
+        mMainPlane = PlaneFactory.newMainPlane(this);
+
+        for (int i = 0; i < Constant.MAX_ENEMY_PLANE_COUNT; i++) {
             EnemyPlane enemyPlane = PlaneFactory.newEnemyPlane(this);
             mEnemyPlaneList.add(enemyPlane);
         }
@@ -98,11 +100,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         mPauseBtnBmp = BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_media_pause);
         mPlayPauseBtnW = mPlayBtnBmp.getWidth();
         mPlayPauseBtnH = mPlayBtnBmp.getHeight();
-
-        Log.d(TAG, "[surfaceCreated] mScreenSize = " + mScreenWidth + " * " + mScreenHeight
-                + ", mPlayPauseBtnSize = " + mPlayPauseBtnW + " * " + mPlayPauseBtnH);
-
-        mSelfPlane.isAlive = true;
 
         mIsPlaying = true;
         mDrawHandler.sendEmptyMessage(MSG_DRAW);
@@ -119,6 +116,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "[surfaceDestroyed] + BEGIN");
         mHandlerThread.quit();
+        mDrawHandler = null;
         Log.d(TAG, "[surfaceDestroyed] + END");
     }
 
@@ -145,12 +143,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
-            mIsTouchSelfPlane = false;
+            mIsTouchMainPlane = false;
             return true;
         } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
             float x = event.getX();
             float y = event.getY();
-            if (x > 20 && x < 20 + mPlayPauseBtnW && y > 20 && y < 20 + mPlayPauseBtnH) {
+            if (x > Constant.MARGIN_PLAY_PAUSE_BTN && x < Constant.MARGIN_PLAY_PAUSE_BTN + mPlayPauseBtnW
+                    && y > Constant.MARGIN_PLAY_PAUSE_BTN && y < Constant.MARGIN_PLAY_PAUSE_BTN + mPlayPauseBtnH) {
                 if (mIsPlaying) {
                     mIsPlaying = false;
                 } else {
@@ -158,37 +157,37 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                     mDrawHandler.sendEmptyMessage(MSG_DRAW);
                 }
                 return true;
-            } else if (x > mSelfPlane.x && x < mSelfPlane.x + mSelfPlane.w
-                    && y > mSelfPlane.y && y < mSelfPlane.y + mSelfPlane.h) {
+            } else if (x > mMainPlane.x && x < mMainPlane.x + mMainPlane.w
+                    && y > mMainPlane.y && y < mMainPlane.y + mMainPlane.h) {
                 if (mIsPlaying) {
-                    mIsTouchSelfPlane = true;
+                    mIsTouchMainPlane = true;
                 }
                 return true;
             }
         } else if (event.getAction() == MotionEvent.ACTION_MOVE && event.getPointerCount() == 1) {
-            if (mIsTouchSelfPlane) {
+            if (mIsTouchMainPlane) {
                 float x = event.getX();
                 float y = event.getY();
-                if (x > mSelfPlane.centerX + ConstantData.TOUCH_PLANE_RANGE) {
-                    if (mSelfPlane.centerX + mSelfPlane.speed <= mScreenWidth) {
-                        float moveX = mSelfPlane.centerX + mSelfPlane.speed;
-                        mSelfPlane.move(moveX, mSelfPlane.centerY);
+                if (x > mMainPlane.centerX + Constant.TOUCH_PLANE_RANGE) {
+                    if (mMainPlane.centerX + mMainPlane.speed <= mScreenWidth) {
+                        float moveX = mMainPlane.centerX + mMainPlane.speed;
+                        mMainPlane.move(moveX, mMainPlane.centerY);
                     }
-                } else if (x < mSelfPlane.centerX - ConstantData.TOUCH_PLANE_RANGE) {
-                    if (mSelfPlane.centerX - mSelfPlane.speed >= 0) {
-                        float moveX = mSelfPlane.centerX - mSelfPlane.speed;
-                        mSelfPlane.move(moveX, mSelfPlane.centerY);
+                } else if (x < mMainPlane.centerX - Constant.TOUCH_PLANE_RANGE) {
+                    if (mMainPlane.centerX - mMainPlane.speed >= 0) {
+                        float moveX = mMainPlane.centerX - mMainPlane.speed;
+                        mMainPlane.move(moveX, mMainPlane.centerY);
                     }
                 }
-                if (y > mSelfPlane.centerY + ConstantData.TOUCH_PLANE_RANGE) {
-                    if (mSelfPlane.centerY + mSelfPlane.speed <= mScreenHeight) {
-                        float moveY = mSelfPlane.centerY + mSelfPlane.speed;
-                        mSelfPlane.move(mSelfPlane.centerX, moveY);
+                if (y > mMainPlane.centerY + Constant.TOUCH_PLANE_RANGE) {
+                    if (mMainPlane.centerY + mMainPlane.speed <= mScreenHeight) {
+                        float moveY = mMainPlane.centerY + mMainPlane.speed;
+                        mMainPlane.move(mMainPlane.centerX, moveY);
                     }
-                } else if (y < mSelfPlane.centerY - ConstantData.TOUCH_PLANE_RANGE) {
-                    if (mSelfPlane.centerY - mSelfPlane.speed >= 0) {
-                        float moveY = mSelfPlane.centerY - mSelfPlane.speed;
-                        mSelfPlane.move(mSelfPlane.centerX, moveY);
+                } else if (y < mMainPlane.centerY - Constant.TOUCH_PLANE_RANGE) {
+                    if (mMainPlane.centerY - mMainPlane.speed >= 0) {
+                        float moveY = mMainPlane.centerY - mMainPlane.speed;
+                        mMainPlane.move(mMainPlane.centerX, moveY);
                     }
                 }
                 return true;
@@ -210,15 +209,18 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             switch (msg.what) {
                 case MSG_DRAW:
                     Log.d(TAG, "[handleMessage] MSG_DRAW");
+                    long startTime = System.currentTimeMillis();
                     initDrawObjs();
                     invokeDrawObjs();
                     if (!mIsPlaying) {
                         this.removeMessages(MSG_DRAW);
                     } else {
-                        int delayTime = 80;
+                        int delayTime = 50;
                         Message newMsg = this.obtainMessage(MSG_DRAW);
                         this.sendMessageDelayed(newMsg, delayTime);
                     }
+                    long endTime = System.currentTimeMillis();
+                    Log.d(TAG, "[handleMessage] time cost = " + (endTime - startTime));
                     break;
                 case MSG_FINISH:
                     Intent intent = new Intent(getApplication(), FinishActivity.class);
@@ -232,7 +234,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         }
 
         private void initDrawObjs() {
-            mSelfPlane.init(mSpeedRate, mSelfPlane.centerX, mSelfPlane.centerY);
+            mMainPlane.init(mSpeedRate, mMainPlane.centerX, mMainPlane.centerY);
 
             for (EnemyPlane obj : mEnemyPlaneList) {
                 if (!obj.isAlive) {
@@ -241,55 +243,48 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
                 }
             }
 
-
-            if (mSumScore >= mSpeedRate * ConstantData.UPGRADE_SPEED_SCORE
-                    && mSpeedRate < ConstantData.MAX_SPEED_RATE) {
+            if (mSumScore >= mSpeedRate * Constant.UPGRADE_SPEED_SCORE
+                    && mSpeedRate < Constant.MAX_SPEED_RATE) {
                 mSpeedRate++;
             }
         }
 
         private void invokeDrawObjs() {
-            try {
-                mCanvas = mSurfaceHolder.lockCanvas();
-                mCanvas.drawColor(Color.WHITE);
+            mCanvas = mSurfaceHolder.lockCanvas();
+            mCanvas.drawColor(Color.WHITE);
 
-                for (EnemyPlane obj : mEnemyPlaneList) {
-                    if (obj.isAlive) {
-                        obj.draw(mCanvas);
-                        if (obj.canCollide() && mSelfPlane.isAlive) {
-                            if (obj.isCollide(mSelfPlane)) {
-                                mSelfPlane.isAlive = false;
-                            }
+            for (EnemyPlane obj : mEnemyPlaneList) {
+                if (obj.isAlive) {
+                    obj.draw(mCanvas);
+                    if (obj.canCollide() && mMainPlane.isAlive) {
+                        if (obj.isCollide(mMainPlane)) {
+                            mMainPlane.isAlive = false;
                         }
                     }
                 }
-
-                if (!mSelfPlane.isAlive) {
-                    mIsPlaying = false;
-                    mDrawHandler.sendEmptyMessage(MSG_FINISH);
-                }
-
-                mCanvas.save();
-                if (mIsPlaying) {
-                    mCanvas.drawBitmap(mPlayBtnBmp, 20, 20, mPaint);
-                } else {
-                    mCanvas.drawBitmap(mPauseBtnBmp, 20, 20, mPaint);
-                }
-                mCanvas.restore();
-
-                mSelfPlane.draw(mCanvas);
-                mSelfPlane.fire(mCanvas, mEnemyPlaneList);
-
-                mPaint.setTextSize(36);
-                mPaint.setColor(textColor);
-                mCanvas.drawText("Score:" + mSumScore + ", Speed:" + mSpeedRate, 30 + mPlayPauseBtnW, 70, mPaint);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (mCanvas != null) {
-                    mSurfaceHolder.unlockCanvasAndPost(mCanvas);
-                }
             }
+
+            if (!mMainPlane.isAlive) {
+                mIsPlaying = false;
+                mDrawHandler.sendEmptyMessage(MSG_FINISH);
+            }
+
+            mCanvas.save();
+            if (mIsPlaying) {
+                mCanvas.drawBitmap(mPlayBtnBmp, Constant.MARGIN_PLAY_PAUSE_BTN, Constant.MARGIN_PLAY_PAUSE_BTN, mPaint);
+            } else {
+                mCanvas.drawBitmap(mPauseBtnBmp, Constant.MARGIN_PLAY_PAUSE_BTN, Constant.MARGIN_PLAY_PAUSE_BTN, mPaint);
+            }
+            mCanvas.restore();
+
+            mMainPlane.draw(mCanvas);
+            mMainPlane.fire(mCanvas, mEnemyPlaneList);
+
+            mPaint.setTextSize(36);
+            mPaint.setColor(textColor);
+            mCanvas.drawText("Score:" + mSumScore + ", Speed:" + mSpeedRate, 30 + mPlayPauseBtnW, 70, mPaint);
+
+            mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
     }
 

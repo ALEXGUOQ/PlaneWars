@@ -10,7 +10,7 @@ import com.hukai.demo.planewars.ActionFire;
 import com.hukai.demo.planewars.ActionMove;
 import com.hukai.demo.planewars.MainActivity;
 import com.hukai.demo.planewars.R;
-import com.hukai.demo.planewars.data.ConstantData;
+import com.hukai.demo.planewars.Constant;
 
 import java.util.List;
 
@@ -19,29 +19,35 @@ import java.util.List;
  * Date: 2014-10-02
  * Author: hukai.me
  */
-public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
+public class MainPlane extends BaseObj implements ActionFire, ActionMove {
 
-    private static final String TAG = SelfPlane.class.getSimpleName();
-    private SelfBullet mSelfBullet;
+    private static final String TAG = MainPlane.class.getSimpleName();
+    private MainBullet mMainBullet;
     private Bitmap mPlaneBmp;
+    private Bitmap mPlaneFireBmp;
 
-    public SelfPlane(Context context) {
-        speed = ConstantData.BASE_PLANE_SPEED;
+    private int fireH;
+
+    public MainPlane(Context context) {
+        speed = Constant.BASE_PLANE_SPEED;
+        isAlive = true;
         mPlaneBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane);
+        mPlaneFireBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane_rear_fire);
         w = mPlaneBmp.getWidth();
         h = mPlaneBmp.getHeight();
+        fireH = mPlaneFireBmp.getHeight();
         x = (MainActivity.mScreenWidth - w) / 2;
         y = MainActivity.mScreenHeight - h;
         centerX = x + w / 2;
         centerY = y + h / 2;
-        mSelfBullet = BulletFactory.newSelfBullet(context);
+        mMainBullet = BulletFactory.newMainBullet(context);
     }
 
     @Override
     public void init(int speedRate, float centerX, float centerY) {
-        speed = ConstantData.BASE_PLANE_SPEED  * (speedRate + 1);
-        if (!mSelfBullet.isAlive) {
-            mSelfBullet.init(ConstantData.BASE_SPEED_RATE, centerX, centerY);
+        speed = Constant.BASE_PLANE_SPEED  * (speedRate + 1);
+        if (!mMainBullet.isAlive) {
+            mMainBullet.init(Constant.BASE_SPEED_RATE, centerX, centerY);
         }
     }
 
@@ -49,7 +55,8 @@ public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
     public void draw(Canvas canvas) {
         if (isAlive) {
             canvas.save();
-            canvas.drawBitmap(mPlaneBmp, x, y, paint);
+            canvas.drawBitmap(mPlaneBmp, x, y - fireH, paint);
+            canvas.drawBitmap(mPlaneFireBmp, x, y - fireH + h, paint);
             canvas.restore();
         }
     }
@@ -63,18 +70,18 @@ public class SelfPlane extends BaseObj implements ActionFire, ActionMove {
 
     @Override
     public void fire(Canvas canvas, List<EnemyPlane> enemyPlanes) {
-        if (!mSelfBullet.isAlive) {
+        if (!mMainBullet.isAlive) {
             return;
         }
         for (EnemyPlane enemyPlane : enemyPlanes) {
-            if (enemyPlane.canCollide() && mSelfBullet.checkCollide(enemyPlane)) {
-                enemyPlane.beAttacked(mSelfBullet.mPower);
+            if (enemyPlane.canCollide() && mMainBullet.checkCollide(enemyPlane)) {
+                enemyPlane.beAttacked(mMainBullet.mPower);
                 if (enemyPlane.isExplosion) {
                     MainActivity.mSumScore += enemyPlane.initBlood;
                 }
                 break;
             }
         }
-        mSelfBullet.draw(canvas);
+        mMainBullet.draw(canvas);
     }
 }

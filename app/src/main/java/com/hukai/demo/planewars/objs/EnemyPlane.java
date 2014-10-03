@@ -4,11 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.util.Log;
 
 import com.hukai.demo.planewars.ActionMove;
 import com.hukai.demo.planewars.MainActivity;
 import com.hukai.demo.planewars.R;
-import com.hukai.demo.planewars.data.ConstantData;
+import com.hukai.demo.planewars.Constant;
 
 import java.util.Random;
 
@@ -18,17 +19,18 @@ import java.util.Random;
  * Author: hukai.me
  */
 public class EnemyPlane extends BaseObj implements ActionMove {
-    public int blood;
     public int initBlood;
     public boolean isExplosion;
-    public boolean isVisible;
+
+    private int blood;
+    private boolean isVisible;
     private Bitmap mEnemyBmp;
 
     public EnemyPlane(Context context) {
         mEnemyBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
         w = mEnemyBmp.getWidth();
         h = mEnemyBmp.getHeight();
-        blood = ConstantData.BASE_PLANE_BLOOD;
+        blood = Constant.BASE_PLANE_BLOOD;
         initBlood = blood;
     }
 
@@ -38,9 +40,9 @@ public class EnemyPlane extends BaseObj implements ActionMove {
         setCenterX(centerX);
         setCenterY(centerY);
         Random random = new Random();
-        speed = (ConstantData.BASE_PLANE_SPEED + random.nextInt(5)) * speedRate;
+        speed = (Constant.BASE_PLANE_SPEED + random.nextInt(3)) * speedRate;
         x = random.nextInt((int) (MainActivity.mScreenWidth - w));
-        y = random.nextInt((int) h * 3) - h;
+        y = random.nextInt(speed) - h;
     }
 
     @Override
@@ -66,11 +68,11 @@ public class EnemyPlane extends BaseObj implements ActionMove {
     @Override
     public void move(float moveX, float moveY) {
         if (y < MainActivity.mScreenHeight) {
-            y += moveY;
+            y = y + moveY;
         } else {
             isAlive = false;
         }
-        if (y + h > 0) {
+        if (y + h > 0 && y < MainActivity.mScreenHeight) {
             isVisible = true;
         } else {
             isVisible = false;
@@ -78,7 +80,7 @@ public class EnemyPlane extends BaseObj implements ActionMove {
     }
 
     public void beAttacked(int power) {
-        blood -= power;
+        blood = blood - power;
         if (blood <= 0) {
             isExplosion = true;
         }
